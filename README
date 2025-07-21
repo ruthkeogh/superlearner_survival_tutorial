@@ -1,0 +1,71 @@
+#################################################################################
+#################################################################################
+#Super learner for time-to-event outcomes tutorial
+#Ruth Keogh, July 2025
+#################################################################################
+#################################################################################
+
+################
+##set-up files##
+################
+
+Run these (packages.R first, rotterdam_setup.R second) before using the other files that run the analyses.
+
+packages.R
+- Loads packages required across all analyses.
+
+rotterdam_setup.R
+- Sets up the Rotterdam dta (available in the survival package). This includes imposing administrative censoring at 10 years. Training and test data sets are created baed on a 70%/30% split. The training data dta_train is used for model fitting and dta_test is used as a holdout or test data set. 
+
+functions.R
+- Includes functions used to calculate meaaures of predictive performance. 
+
+censoring_weights.R
+- Obtains censoring weights in the test data (dta_test), which are required for estimating predictive performance measures using the functions in functions.R, and in some functions used from packages. 
+
+##files implementing individual models/learners##
+
+method_coxph.R
+- Fits a Cox model to dta_train and evaluates predictive performance in dta_test.
+
+method_coxlasso.R
+- Fits a Cox model with Lasso to dta_train and evaluates predictive performance in dta_test.
+
+method_rfsrc.R
+- Fits a survival random forest to dta_train and evaluates predictive performance in dta_test.
+
+###################################################
+##files implementing discrete-time super learners##
+###################################################
+
+method_discretetime_SL_10periods.R
+- Implements the discrete-time ensemble SL of Polley & van der Laan 2011 using dta_train and evaluates predictive performance in dta_test.
+- Uses discretisation into 10 time periods of equal length.
+- Uses the SuperLearner package.
+
+method_discretetime_SL_100periods.R
+- Implements the discrete-time ensemble SL of Polley & van der Laan 2011 using dta_train and evaluates predictive performance in dta_test.
+- Uses discretisation into 100 time periods of equal length.
+- Uses the SuperLearner package.
+
+method_discretetime_SL_100periods_byhand.R
+- Implements the discrete-time ensemble SL of Polley & van der Laan 2011 using dta_train and evaluates predictive performance in dta_test.
+- Uses discretisation into 100 time periods of equal length.
+- Show how to do this 'by hand' without using the SuperLearner package.
+
+#####################################################
+##files implementing continuous-time super learners##
+#####################################################
+
+method_continuoustime_SL_Westling.R
+- Implements the continuous-time ensemble SL of Westling et al. 2023 using dta_train and evaluates predictive performance in dta_test.
+- Uses the survSuperLearner package.
+
+method_continuoustime_SL_MunchGerds.R
+- Implements the continuous-time discrete SL of Munch & Gerds 2024 using dta_train and evaluates predictive performance in dta_test.
+- Uses code from https://github.com/amnudn/joint-survival-super-learner.
+
+method_continuoustime_SL_MunchGerds_byhand.R
+- Implements the continuous-time discrete SL of Munch & Gerds 2024 using dta_train and evaluates predictive performance in dta_test.
+- Show how to do this 'by hand' without using the statelearner code.
+
