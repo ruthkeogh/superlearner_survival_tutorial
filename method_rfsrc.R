@@ -6,6 +6,11 @@
 #################################################################################
 #################################################################################
 
+source("packages.R")
+source("rotterdam_setup.R")
+source("functions.R")
+source("censoring_weights.R")
+
 #---------------------------------
 #---------------------------------
 #fit random forest
@@ -30,7 +35,6 @@ print(rfsrc.fit)
 #obtain predictions
 #---------------------------------
 #---------------------------------
-
 
 rfsrc.pred<-predict(rfsrc.fit, newdata=dta_test, importance='none')
 rfsrc.surv<-rfsrc.pred$survival

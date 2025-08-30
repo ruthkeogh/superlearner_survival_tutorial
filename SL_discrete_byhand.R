@@ -9,6 +9,12 @@
 #################################################################################
 #################################################################################
 
+source("packages.R")
+source("rotterdam_setup.R")
+source("functions.R")
+source("censoring_weights.R")
+
+
 #---
 #divide training data into 5 folds
 n<-dim(dta_train)[1]
@@ -17,7 +23,7 @@ set.seed(1430)
 dta_train$cv.group<-cut(runif(n,0,n.fold),breaks=seq(0,n.fold,1),include.lowest = T,labels = F)
 
 #---
-#put data into counting process format using 30 day periods
+#put data into counting process format using periods of length 0.1 years
 dta_train_split<-survSplit(Surv(time,status)~.,data=dta_train,cut = seq(0,max(dta_train$time),0.1),start="tstart",end="tstop",event="status")
 
 #generate time^2 and time^3 variables to be used as covariates in the SL
@@ -84,7 +90,6 @@ for(i in 1:n.fold){
   #---
   #method 3: lasso
   xmat.cvtrain<-model.matrix(method.glm1)[,-1]
-  test$status=99#just a trick so that we can use model.matrix to get xmat.test
   xmat.cvtest<-model.matrix(method.glm1,data=cvtest)[,-1]
   method.lasso <- cv.glmnet(x=xmat.cvtrain,y=cvtrain$status,family = "binomial",alpha=1)
   haz.pred.all[cvtest.rows,3]<-predict(method.lasso, newx = xmat.cvtest, s = "lambda.min",type="response")
@@ -301,11 +306,7 @@ risk.pred<-1-surv.pred.SL.ipcw
 #---------------------------------
 
 #---
-#calibration plot - using riskRegression
-#Not sure this is possible
-
-#---
-#calibration plot - using our function
+#calibration plot
 cut_points=c(0,quantile(risk.pred,probs=seq(0.1,0.9,0.1)),1)
 risk_group=cut(risk.pred,breaks=cut_points,include.lowest = T,labels = F)
 calib_risk_group<-sapply(FUN=function(x){mean(risk.pred[risk_group==x])},1:10)
@@ -330,25 +331,13 @@ abline(0,1)
 #---------------------------------
 
 #---
-#Brier score and IPA - using riskRegression
-#Not sure this is possible
-
-#---
-#Brier score and IPA - using our function
+#Brier score and IPA
 
 Brier(time=dta_test$time, status=dta_test$status, risk=risk.pred, 
       seq.time=10, weights=dta_test$cens.wt)
 
 ipa(time=dta_test$time, status=dta_test$status, risk=risk.pred, 
     seq.time=10, weights=dta_test$cens.wt)
-
-#---
-#Integrated Brier score - using riskRegression
-#?
-
-#---
-#Integrated Brier score - using pec
-#?
 
 #---------------------------------
 #C-index, AUC and AUCt
@@ -363,11 +352,6 @@ concordance(Surv(dta_test$time, dta_test$status) ~ risk.pred,
             newdata=dta_test,
             reverse = TRUE,
             timewt = "n/G2")$concordance
-
-
-#---
-#AUC - using Score
-#?
 
 #---
 #AUC - using timeROC

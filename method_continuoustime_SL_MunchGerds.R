@@ -7,6 +7,11 @@
 #################################################################################
 #################################################################################
 
+source("packages.R")
+source("rotterdam_setup.R")
+source("functions.R")
+source("censoring_weights.R")
+
 #---------------------------------
 #---------------------------------
 #superlearner
@@ -66,7 +71,7 @@ risk.pred<-1-approx.surv
 #---
 #Note that the statelearner code suggests we should be able to use predict to get predictions based on the best fitting model, as shown below.
 #But this gives somewhat different results to just refitting the survival random forest, with poor predictive performance
-#It is possible that this is getting the cumulative incidence for the event beign oibserved in a world in which censoring occurs, i.e. the F function 
+#It is possible that this is getting the cumulative incidence for the event being observed in a world in which censoring occurs, i.e. the F function 
 
 # dta_test2<-dta_test
 # dta_test2<-dta_test2[,c("year1","year2","age","meno","size1","size2","grade","nodes","pgr","er","hormon","chemo")]
@@ -85,11 +90,7 @@ risk.pred<-1-approx.surv
 #---------------------------------
 
 #---
-#calibration plot - using riskRegression
-#Not sure this is possible
-
-#---
-#calibration plot - using our function
+#calibration plot
 cut_points=c(0,quantile(risk.pred,probs=seq(0.1,0.9,0.1)),1)
 risk_group=cut(risk.pred,breaks=cut_points,include.lowest = T,labels = F)
 calib_risk_group<-sapply(FUN=function(x){mean(risk.pred[risk_group==x])},1:10)

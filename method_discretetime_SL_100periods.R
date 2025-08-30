@@ -7,6 +7,11 @@
 #################################################################################
 #################################################################################
 
+source("packages.R")
+source("rotterdam_setup.R")
+source("functions.R")
+source("censoring_weights.R")
+
 #---------------------------------
 #---------------------------------
 #superlearner
@@ -69,10 +74,6 @@ risk.pred<-1-pred.dat$surv[pred.dat$tstart==10]
 #---------------------------------
 
 #---
-#calibration plot - using riskRegression
-#Not sure this is possible
-
-#---
 #calibration plot - using our function
 cut_points=c(0,quantile(risk.pred,probs=seq(0.1,0.9,0.1)),1)
 risk_group=cut(risk.pred,breaks=cut_points,include.lowest = T,labels = F)
@@ -100,10 +101,6 @@ abline(0,1)
 #---------------------------------
 
 #---
-#Brier score and IPA - using riskRegression
-#Not sure this is possible
-
-#---
 #Brier score and IPA - using our function
 
 Brier(time=dta_test$time, status=dta_test$status, risk=risk.pred, 
@@ -111,14 +108,6 @@ Brier(time=dta_test$time, status=dta_test$status, risk=risk.pred,
 
 ipa(time=dta_test$time, status=dta_test$status, risk=risk.pred, 
     seq.time=10, weights=dta_test$cens.wt)
-
-#---
-#Integrated Brier score - using riskRegression
-#?
-
-#---
-#Integrated Brier score - using pec
-#?
 
 #---------------------------------
 #---------------------------------
@@ -135,10 +124,6 @@ concordance(Surv(dta_test$time, dta_test$status) ~ risk.pred,
             newdata=dta_test,
             reverse = TRUE,
             timewt = "n/G2")$concordance
-
-#---
-#AUC - using Score
-#?
 
 #---
 #AUC - using timeROC

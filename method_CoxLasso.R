@@ -6,6 +6,11 @@
 #################################################################################
 #################################################################################
 
+source("packages.R")
+source("rotterdam_setup.R")
+source("functions.R")
+source("censoring_weights.R")
+
 #---------------------------------
 #---------------------------------
 #fit Cox-lasso model
@@ -75,19 +80,6 @@ Brier(time=dta_test$time, status=dta_test$status, risk=cox.pred,
 ipa(time=dta_test$time, status=dta_test$status, risk=cox.pred, 
     seq.time=10, weights=dta_test$cens.wt)
 
-#---
-#Integrated Brier score - using riskRegression
-#Not sure how to get this to work: code is from standard coxph
-# Score(list(Cox=cox.mod),Surv(time,status)~1,data=dta_test,
-#       metrics="brier",times=seq(0,10,0.1),summary="ibs")
-
-#---
-#Integrated Brier score - using pec
-#Not working
-# risk.matrix<-1-t(cox.pred.alltimes$surv)
-# 
-# pec(risk.matrix,times=cox.pred.alltimes$time,data=dta_test,formula=Surv(time,status)~1,exact=F)
-
 #---------------------------------
 #---------------------------------
 #C-index, AUC and AUCt
@@ -103,12 +95,6 @@ concordance(Surv(dta_test$time, dta_test$status) ~ cox.pred,
             newdata=dta_test,
             reverse = TRUE,
             timewt = "n/G2")$concordance
-
-#---
-#AUC - using Score
-#Not sure how to get this to work: code is from standard coxph
-# Score(list(Cox=cox.mod),Surv(time,status)~1,data=dta_test,
-#       metrics="auc",times=10)
 
 #---
 #AUC - using timeROC

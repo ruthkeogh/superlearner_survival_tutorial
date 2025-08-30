@@ -14,11 +14,20 @@ Run these (packages.R first, rotterdam_setup.R second) before using the other fi
 packages.R
 - Loads packages required across all analyses.
 
+- To install survSuperLearner, use:
+library(devtools)
+devtools::install_github("tedwestling/survSuperLearner")
+More information is available at https://github.com/tedwestling/survSuperLearner
+
+- To install statelearner, download the repository at https://github.com/amnudn/joint-survival-super-learner/tree/main
+and load all functions in the R-code folder
+
+
 rotterdam_setup.R
 - Sets up the Rotterdam dta (available in the survival package). This includes imposing administrative censoring at 10 years. Training and test data sets are created baed on a 70%/30% split. The training data dta_train is used for model fitting and dta_test is used as a holdout or test data set. 
 
 functions.R
-- Includes functions used to calculate meaaures of predictive performance. 
+- Includes functions used to calculate measures of predictive performance. 
 
 censoring_weights.R
 - Obtains censoring weights in the test data (dta_test), which are required for estimating predictive performance measures using the functions in functions.R, and in some functions used from packages. 

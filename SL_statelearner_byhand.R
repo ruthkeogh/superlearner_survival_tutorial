@@ -9,6 +9,11 @@
 #################################################################################
 #################################################################################
 
+source("packages.R")
+source("rotterdam_setup.R")
+source("functions.R")
+source("censoring_weights.R")
+
 #divide data into 5 folds
 n<-dim(dta_train)[1]
 set.seed(1430)
