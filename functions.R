@@ -73,9 +73,9 @@ c_index_ties <- function(time, status, risk, weightmatrix=NULL, tau)
   return(cindex)
 }
 
-
 #---------------
-#function for cumulative dynamic AUCt with ipc weights
+#function for cumulative dynamic AUCt with ipc weights: 
+#with acknowledgement to Ilaria Prosepe for modifications to this function
 
 wCD_AUCt <- function (time, status, risk, seq.time, plot = T, weightmatrix=NULL, xlim=5) 
   #Input:
@@ -95,6 +95,8 @@ wCD_AUCt <- function (time, status, risk, seq.time, plot = T, weightmatrix=NULL,
     weightmatrix=matrix(1,nrow=length(time),ncol = length(tt))
   }
   nseq <- length(seq.time)
+  colnames(weightmatrix) <- tt #IP
+  
   AUCt <- rep(NA,nseq)                  #vector to save AUCt in
   for (i in 1:nseq)                   #loop over time points where you want to calculate C/D AUCt
   {
@@ -111,8 +113,13 @@ wCD_AUCt <- function (time, status, risk, seq.time, plot = T, weightmatrix=NULL,
       n1k <- n1[k]                    #index in original data of the k'th case
       xi <- x[n1k]                    # risk of the k'th case 
       ttk <- which(tt==time[n1k])     #index among unique event times for the k'th case
-      numsum   <- numsum   + weightmatrix[n1k,ttk] * (x[n0]<xi)%*%weightmatrix[n0,ncol(weightmatrix)] + 0.5 * weightmatrix[n1k,ttk] * (x[n0] == xi) %*% weightmatrix[n0,ncol(weightmatrix)]
-      denomsum <- denomsum + weightmatrix[n1k,ttk] * sum(weightmatrix[n0,ncol(weightmatrix)]) 
+      # IP: replaced these lines
+      # numsum   <- numsum   + weightmatrix[n1k,ttk] * (x[n0]<xi)%*%weightmatrix[n0,ncol(weightmatrix)] + 0.5 * weightmatrix[n1k,ttk] * (x[n0] == xi) %*% weightmatrix[n0,ncol(weightmatrix)]
+      # denomsum <- denomsum + weightmatrix[n1k,ttk] * sum(weightmatrix[n0,ncol(weightmatrix)]) 
+      # with
+      numsum   <- numsum   + weightmatrix[n1k,ttk] * (x[n0]<xi)%*%weightmatrix[n0,as.character(ti)] + 0.5 * weightmatrix[n1k,ttk] * (x[n0] == xi) %*% weightmatrix[n0,as.character(ti)]
+      denomsum <- denomsum + weightmatrix[n1k,ttk] * sum(weightmatrix[n0,as.character(ti)]) 
+      
       #note that the weight for the case is evaluated at it's own unique event time point
       #the weight for the controls are evaluated at the time point where you want to calculate C/D AUCt
     }
@@ -126,3 +133,4 @@ wCD_AUCt <- function (time, status, risk, seq.time, plot = T, weightmatrix=NULL,
   }
   return(list(AUCt=data.frame(time=seq.time,AUC=AUCt)))
 }
+
