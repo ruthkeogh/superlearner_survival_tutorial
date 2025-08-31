@@ -126,9 +126,9 @@ timeROC( T = dta_test$time,delta = dta_test$status,marker = cox.pred,
 
 #---
 #C/D AUCt - using our function
-#it is very slightly lower using our function
-#Our function only works for observed times in the data
-wCD_AUCt(time=dta_test$time,status=dta_test$status, risk=cox.pred, seq.time = 10, weightmatrix = wt_matrix_eventsonly)
+max.event.time<-max(dta_test$time[dta_test$status==1])
+wCD_AUCt(time=dta_test$time,status=dta_test$status, risk=risk.pred, seq.time =max.event.time, weightmatrix = wt_matrix_eventsonly)
+
 
 
 

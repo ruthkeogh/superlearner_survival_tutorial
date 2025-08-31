@@ -360,8 +360,9 @@ timeROC( T = dta_test$time,delta = dta_test$status,marker = risk.pred,
 
 #---
 #C/D AUCt - using our function
-#it is very slightly lower using our function
-wCD_AUCt(time=dta_test$time,status=dta_test$status, risk=risk.pred, seq.time = 10, weightmatrix = wt_matrix_eventsonly)
+max.event.time<-max(dta_test$time[dta_test$status==1])
+wCD_AUCt(time=dta_test$time,status=dta_test$status, risk=risk.pred, seq.time =max.event.time, weightmatrix = wt_matrix_eventsonly)
+
 
 
 

@@ -53,9 +53,7 @@ dta_test.pred$tstart7<-I(dta_test.pred$tstart==7)
 dta_test.pred$tstart8<-I(dta_test.pred$tstart==8)
 dta_test.pred$tstart9<-I(dta_test.pred$tstart==9)
 
-#apply SuperLearner
-#strangely this sometimes gives an error, even when I use the same seed. 
-#I think this could be if one of the time variables is 0 o 1 for everyone in one of the cross-validation data sets
+#apply SuperLearner using NNLS
 #change to method = "method.NNloglik" for loss function based on loglik
 set.seed(1)
 sl<-SuperLearner(Y=dta_train.split$event,
@@ -69,7 +67,7 @@ sl<-SuperLearner(Y=dta_train.split$event,
                                           "er","hormon","chemo")],
                     family = binomial(), 
                     SL.library= list("SL.mean", "SL.glm", "SL.glmnet", "SL.ranger"),
-                    method = "method.NNloglik", id = dta_train.split$pid, verbose = TRUE,
+                    method = "method.NNLS", id = dta_train.split$pid, verbose = TRUE,
                     cvControl = list(V=5))
 
 #---------------------------------
@@ -149,9 +147,6 @@ timeROC( T = dta_test$time,delta = dta_test$status,marker = risk.pred,
 
 #---
 #C/D AUCt - using our function
-#it is very slightly lower using our function
-wCD_AUCt(time=dta_test$time,status=dta_test$status, risk=risk.pred, seq.time = 10, weightmatrix = wt_matrix_eventsonly)
-
-
-
+max.event.time<-max(dta_test$time[dta_test$status==1])
+wCD_AUCt(time=dta_test$time,status=dta_test$status, risk=risk.pred, seq.time =max.event.time, weightmatrix = wt_matrix_eventsonly)
 
