@@ -9,7 +9,8 @@
 source("packages.R")
 source("rotterdam_setup.R")
 source("functions.R")
-source("censoring_weights.R")
+source("censoring_weights_KM.R")#Kaplan-Meier estimates of censoring weights
+# source("censoring_weights_discretetime_SL.R")#uncomment to use SL estimates of censoring weights instead
 
 #---------------------------------
 #---------------------------------
