@@ -298,7 +298,8 @@ surv.pred.SL.ipcw<-weights.ipcw[1]*surv.pred[,1]+
 #-------------------------------------------------------
 #-------------------------------------------------------
 
-#the line below can be altered depending on which SL we want to evaluate (surv.pred.SL.L2,surv.pred.SL.loglik,surv.pred.SL.ipcw)
+#the line below can be altered depending on which SL we want to evaluate 
+#(surv.pred.SL.L2,surv.pred.SL.loglik,surv.pred.SL.ipcw)
 risk.pred<-1-surv.pred.SL.ipcw
 
 #---------------------------------
@@ -327,7 +328,7 @@ plot(calib_risk_group,risk_obs_grp,type="both",xlab="Predicted risk",ylab="Estim
 abline(0,1)
 
 #---------------------------------
-#Brier score, IPA, and integrated Brier score
+#Brier score and Scaled Brier (IPA)
 #---------------------------------
 
 #---
@@ -340,7 +341,7 @@ ipa(time=dta_test$time, status=dta_test$status, risk=risk.pred,
     seq.time=10, weights=dta_test$cens.wt)
 
 #---------------------------------
-#C-index, AUC and AUCt
+#C-index and AUC
 #---------------------------------
 
 #---
@@ -354,16 +355,14 @@ concordance(Surv(dta_test$time, dta_test$status) ~ risk.pred,
             timewt = "n/G2")$concordance
 
 #---
-#AUC - using timeROC
-timeROC( T = dta_test$time,delta = dta_test$status,marker = risk.pred,
-         cause = 1,weighting = "marginal",times = 10,iid = FALSE)
-
-#---
 #C/D AUCt - using our function
 max.event.time<-max(dta_test$time[dta_test$status==1])
 wCD_AUCt(time=dta_test$time,status=dta_test$status, risk=risk.pred, seq.time =max.event.time, weightmatrix = wt_matrix_eventsonly)
 
-
+#---
+#AUC - using timeROC
+timeROC( T = dta_test$time,delta = dta_test$status,marker = risk.pred,
+         cause = 1,weighting = "marginal",times = 10,iid = FALSE)
 
 
 

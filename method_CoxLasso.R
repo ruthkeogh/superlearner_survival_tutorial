@@ -36,8 +36,8 @@ predict(cox.lasso, newx = xmat.test, s = "lambda.min",type="nonzero")
 
 #see https://cran.r-project.org/web/packages/glmnet/vignettes/Coxnet.pdf
 #survfit:coxnet gives survival probabilities at all times, and we can then obtain the estimates of risk up to time 10
-cox.pred.alltimes <- survfit(cox.lasso, s = "lambda.min", x = xmat.train, y = Surv(dta_train$time,dta_train$status), newx = xmat.test)
-cox.pred <- 1-cox.pred.alltimes$surv[cox.pred.alltimes$time==10,]
+risk.pred.alltimes <- survfit(cox.lasso, s = "lambda.min", x = xmat.train, y = Surv(dta_train$time,dta_train$status), newx = xmat.test)
+risk.pred <- 1-risk.pred.alltimes$surv[risk.pred.alltimes$time==10,]
 
 #---------------------------------
 #---------------------------------
@@ -47,9 +47,9 @@ cox.pred <- 1-cox.pred.alltimes$surv[cox.pred.alltimes$time==10,]
 
 #---
 #calibration plot - using our function
-cut_points=c(0,quantile(cox.pred,probs=seq(0.1,0.9,0.1)),1)
-risk_group=cut(cox.pred,breaks=cut_points,include.lowest = T,labels = F)
-calib_risk_group<-sapply(FUN=function(x){mean(cox.pred[risk_group==x])},1:10)
+cut_points=c(0,quantile(risk.pred,probs=seq(0.1,0.9,0.1)),1)
+risk_group=cut(risk.pred,breaks=cut_points,include.lowest = T,labels = F)
+calib_risk_group<-sapply(FUN=function(x){mean(risk.pred[risk_group==x])},1:10)
 
 km.grp=survfit(Surv(time,status)~strata(risk_group),data=dta_test)
 
@@ -68,46 +68,44 @@ abline(0,1)
 
 #---------------------------------
 #---------------------------------
-#Brier score, IPA, and integrated Brier score
+#Brier score and Scaled Brier (IPA)
 #---------------------------------
 #---------------------------------
 
 #---
 #Brier score and IPA - using our function
 
-Brier(time=dta_test$time, status=dta_test$status, risk=cox.pred, 
+Brier(time=dta_test$time, status=dta_test$status, risk=risk.pred, 
       seq.time=10, weights=dta_test$cens.wt)
 
-ipa(time=dta_test$time, status=dta_test$status, risk=cox.pred, 
+ipa(time=dta_test$time, status=dta_test$status, risk=risk.pred, 
     seq.time=10, weights=dta_test$cens.wt)
 
 #---------------------------------
 #---------------------------------
-#C-index, AUC and AUCt
+#C-index and AUC
 #---------------------------------
 #---------------------------------
 
 #---
 #C-index - using our function
-c_index_ties(time=dta_test$time,status=dta_test$status, risk=cox.pred, tau=10, weightmatrix = wt_matrix_eventsonly)
+c_index_ties(time=dta_test$time,status=dta_test$status, risk=risk.pred, tau=10, weightmatrix = wt_matrix_eventsonly)
 
 #c-index - using concordance
-concordance(Surv(dta_test$time, dta_test$status) ~ cox.pred,
+concordance(Surv(dta_test$time, dta_test$status) ~ risk.pred,
             newdata=dta_test,
             reverse = TRUE,
             timewt = "n/G2")$concordance
-
-#---
-#AUC - using timeROC
-timeROC( T = dta_test$time,delta = dta_test$status,marker = cox.pred,
-         cause = 1,weighting = "marginal",times = 10,iid = FALSE)
 
 #---
 #C/D AUCt - using our function
 max.event.time<-max(dta_test$time[dta_test$status==1])
 wCD_AUCt(time=dta_test$time,status=dta_test$status, risk=risk.pred, seq.time =max.event.time, weightmatrix = wt_matrix_eventsonly)
 
-
+#---
+#AUC - using timeROC
+timeROC( T = dta_test$time,delta = dta_test$status,marker = risk.pred,
+         cause = 1,weighting = "marginal",times = 10,iid = FALSE)
 
 
 

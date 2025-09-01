@@ -88,7 +88,7 @@ abline(0,1)
 
 #---------------------------------
 #---------------------------------
-#Brier score, IPA, and integrated Brier score
+#Brier score and Scaled Brier (IPA)
 #---------------------------------
 #---------------------------------
 
@@ -107,20 +107,9 @@ Brier(time=dta_test$time, status=dta_test$status, risk=risk.pred,
 ipa(time=dta_test$time, status=dta_test$status, risk=risk.pred, 
     seq.time=10, weights=dta_test$cens.wt)
 
-#---
-#Integrated Brier score - using riskRegression
-Score(list(rf=rfsrc.fit),Surv(time,status)~1,data=dta_test,
-      metrics="brier",times=seq(0,10,0.1),summary="ibs")
-
-#---
-#Integrated Brier score - using pec
-#This also gives the integrates Brier score
-#Results are similar to those obtained above using Score, provided we use a fine time grid for 'times' in Score
-pec(list(rf=rfsrc.fit),data=dta_test,formula=Surv(time,status)~1)
-
 #---------------------------------
 #---------------------------------
-#C-index, AUC and AUCt
+#C-index and AUC
 #---------------------------------
 #---------------------------------
 
@@ -135,7 +124,12 @@ concordance(Surv(dta_test$time, dta_test$status) ~ risk.pred,
             timewt = "n/G2")$concordance
 
 #---
-#AUC - using Score
+#C/D AUCt - using our function
+max.event.time<-max(dta_test$time[dta_test$status==1])
+wCD_AUCt(time=dta_test$time,status=dta_test$status, risk=risk.pred, seq.time =max.event.time, weightmatrix = wt_matrix_eventsonly)
+
+#---
+#AUC - using riskRegression
 Score(list(rf=rfsrc.fit),Surv(time,status)~1,data=dta_test,
       metrics="auc",times=10)
 
@@ -143,12 +137,6 @@ Score(list(rf=rfsrc.fit),Surv(time,status)~1,data=dta_test,
 #AUC - using timeROC
 timeROC( T = dta_test$time,delta = dta_test$status,marker = risk.pred,
          cause = 1,weighting = "marginal",times = 10,iid = FALSE)
-
-#---
-#C/D AUCt - using our function
-max.event.time<-max(dta_test$time[dta_test$status==1])
-wCD_AUCt(time=dta_test$time,status=dta_test$status, risk=risk.pred, seq.time =max.event.time, weightmatrix = wt_matrix_eventsonly)
-
 
 
 

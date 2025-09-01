@@ -72,7 +72,7 @@ create.SL.ranger(5)
 
 
 SL.library<-list("SL.mean", "SL.glm", "SL.bayesglm",
-                 "SL.glmnet","SL.glmnet.0","SL.glmnet.0.5","SL.ranger",
+                 "SL.glmnet","SL.glmnet.0","SL.glmnet.0.5",
                  "SL.gam.2","SL.gam.3","SL.gam.4","SL.gam.5",
                  "SL.xgboost.3.0.1.10","SL.xgboost.4.0.1.10","SL.xgboost.4.0.1.1",
                  "SL.xgboost.6.0.1.10","SL.xgboost.6.0.1.1",
