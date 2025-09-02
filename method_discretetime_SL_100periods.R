@@ -43,7 +43,7 @@ set.seed(1)
 sl<-SuperLearner(Y=dta_train.split$event,X=dta_train.split[,c("tstart","tstart2","tstart3","year1","year2","age","meno","size1","size2","grade","nodes","pgr","er","hormon","chemo")] ,
                     newX=dta_test.pred[,c("tstart","tstart2","tstart3","year1","year2","age","meno","size1","size2","grade","nodes","pgr","er","hormon","chemo")],
                     family = binomial(), SL.library= list("SL.mean", "SL.glm", "SL.glmnet", "SL.ranger"),
-                    method = "method.NNloglik", id = dta_train.split$pid, verbose = TRUE,
+                    method = "method.NNLS", id = dta_train.split$pid, verbose = TRUE,
                     cvControl = list(V=5))
 
 # example including two versions of glm: one including all covariates and one using randomForest as a screening algorithm (this is slow)

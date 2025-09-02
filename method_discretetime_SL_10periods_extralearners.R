@@ -134,8 +134,11 @@ sl<-SuperLearner(Y=dta_train.split$event,
                                        "er","hormon","chemo")],
                  family = binomial(), 
                  SL.library= SL.library,
-                 method = "method.NNloglik", id = dta_train.split$pid, verbose = TRUE,
+                 method = "method.NNLS", id = dta_train.split$pid, verbose = TRUE,
                  cvControl = list(V=5))
+
+#coefficients in the ensemble
+sl$coef
 
 #---------------------------------
 #---------------------------------
