@@ -37,7 +37,9 @@ censoring_weights_continuoustime_SL_MunchGerds.R
 - censoring_weights_KM.R obtain the weights using Kaplan-Meier, assuming censoring is independent of covariates.
 - The other three censoring weights files obtain the weights using super learners of different types, allowing censoring to depend on covariates
 
+#################################################
 ##files implementing individual models/learners##
+#################################################
 
 method_coxph.R
 - Fits a Cox model to dta_train and evaluates predictive performance in dta_test.
@@ -92,3 +94,13 @@ method_continuoustime_SL_MunchGerds_byhand.R
 - Implements the continuous-time discrete SL of Munch & Gerds 2024 using dta_train and evaluates predictive performance in dta_test.
 - Show how to do this 'by hand' without using the statelearner code.
 
+#########################################################
+##files implementing pseudo observations super learner##
+#########################################################
+
+method_pseudoobs_SL.R
+- Implements the SL for pseudo observations as described by Sachs et al. 2019, using dta_train and evaluates predictive performance in dta_test.
+- Uses the superLearner package, and makes use of Michael Sach's code from https://github.com/sachsmc/pseupersims
+
+functions_pseudoobs_SL.R
+- This file provides functions from the utils.R file of Sachs (https://github.com/sachsmc/pseupersims), with minor modifications to remove the handling of competing events.
