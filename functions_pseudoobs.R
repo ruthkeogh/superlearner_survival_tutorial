@@ -2,7 +2,7 @@
 #################################################################################
 #Super learner for time-to-event outcomes tutorial
 #
-#Method: pseudo values super learner
+#Method: pseudo observations super learner
 #Sachs et al. 2019
 #
 #Implemented using superlearner, and making use of Michael Sach's code from https://github.com/sachsmc/pseupersims

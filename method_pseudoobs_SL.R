@@ -2,7 +2,7 @@
 #################################################################################
 #Super learner for time-to-event outcomes tutorial
 #
-#Method: pseudo values super learner
+#Method: pseudo observations super learner
 #Sachs et al 2019
 #
 #Implemented using superLearner package, 
@@ -13,7 +13,7 @@
 source("packages.R")
 source("rotterdam_setup.R")
 source("functions.R")
-source("functions_pseudovalues.R")
+source("functions_pseudoobs.R")
 source("censoring_weights_KM.R")#Kaplan-Meier estimates of censoring weights
 # source("censoring_weights_discretetime_SL.R")#uncomment to use SL estimates of censoring weights instead
 
@@ -23,68 +23,45 @@ library(kernlab)
 
 #---------------------------------
 #---------------------------------
-#calculate pseudo values at times 1:10
+#calculate pseudo observations at times 1:10
 #this uses the add_pseudo_obs which is modified form the code of Sachs.
-#Create a new version of the data which contains pseudo values at times 1:10 and a time variable (pvtime), 
+#Create a new version of the data which contains pseudo observations at times 1:10 and a time variable (ptime), 
 #---------------------------------
 #---------------------------------
 
 add_pseudo_obs <- function(data, tme = 1:10) {
   
   psuo <- pseudoci(data$time, event = data$status, tmax = tme)
-  data <- do.call(rbind, lapply(1:length(tme), function(x) cbind(data, cause1.pseudo = psuo$pseudo$cause1[, x], pvtime = tme[x])))
+  data <- do.call(rbind, lapply(1:length(tme), 
+                                function(x) cbind(data, 
+                                                  pseudo = psuo$pseudo$cause1[, x], 
+                                                  ptime = tme[x])))
   data
 }
 
-#dta_train_pv is stacked across times 1:10
-dta_train_pv<-add_pseudo_obs(data=dta_train,tme=1:10)
+#dta_train_p is stacked across times 1:10
+dta_train_p<-add_pseudo_obs(data=dta_train,tme=1:10)
 
 #---------------------------------
 #---------------------------------
-#Superlearner using pseudovalues at 10 time horizons
+#Superlearner using pseudo observations at 10 time horizons
 #---------------------------------
 #---------------------------------
 
 #add time of interest to the test data
-dta_test$pvtime<-10
+dta_test$ptime<-10
 
-sl.full <- SuperLearner(Y = dta_train_pv$pv, 
-                        X = dta_train_pv[,c("pvtime","year1","year2","age","meno","size1","size2","grade","nodes","pgr",
-                                            "er","hormon","chemo")],
-                        newX=dta_test[,c("pvtime","year1","year2","age","meno","size1","size2","grade","nodes","pgr",
-                                         "er","hormon","chemo")],
-                        SL.library = SL.library, 
-                        id = dta_train_pv$id,
-                        verbose = TRUE, 
-                        method = "method.pseudoAUC", 
-                        control = list(timedex = dta_train_pv$pvtime == 10),
-                        cvControl = list(V=5))
+#set up learners 
+tune = list(ntrees = c(200),
+            max_depth = 2,
+            shrinkage = c(0.01, 0.1, .2))
+learners = create.Learner("SL.xgboost", tune = tune, detailed_names = T, name_prefix = "xgb")
 
+SL.library <-  c("SL.glm",  "SL.gam",  "SL.ksvm", "SL.ranger",
+                 "SL.rpart", "SL.glmnet","SL.polymars", learners$names)
 
-#using 1 time horizon only
-
-# dta_train_pv10<-dta_train_pv[dta_train_pv$pvtime==10,]
-# 
-# 
-# sl.full10 <- SuperLearner(Y = dta_train_pv10$pv, 
-#                           X = dta_train_pv10[,c("year1","year2","age","meno","size1","size2","grade","nodes","pgr",
-#                                                 "er","hormon","chemo")],
-#                           newX=dta_test[,c("year1","year2","age","meno","size1","size2","grade","nodes","pgr",
-#                                            "er","hormon","chemo")],
-#                           SL.library = list("SL.mean", "SL.glm", "SL.glmnet", "SL.ranger"), 
-#                           id = dta_train_pv10$id,
-#                           verbose = TRUE, 
-#                           method = "method.pseudoAUC", control = list(timedex = dta_train_pv10$pvtime == 10))
-# 
-# sl.full10$SL.predict
-
-#---------------------------------
-#---------------------------------
-#Superlearner using pseudovalues at 10 time horizons
-#---------------------------------
-#---------------------------------
-
-#standardise continuous variables
+#standardise continuous variables, 
+#as this seems to make quite a big difference to avoiding pseudo observatiosn outside the range form 0 to 1
 
 mean.age<-mean(dta_train$age)
 sd.age<-sd(dta_train$age)
@@ -98,40 +75,27 @@ sd.pgr<-sd(dta_train$pgr)
 mean.er<-mean(dta_train$er)
 sd.er<-sd(dta_train$er)
 
-dta_train_pv$age_std<-(dta_train_pv$age-mean.age)/sd.age
-dta_train_pv$nodes_std<-(dta_train_pv$nodes-mean.nodes)/sd.nodes
-dta_train_pv$pgr_std<-(dta_train_pv$pgr-mean.pgr)/sd.pgr
-dta_train_pv$er_std<-(dta_train_pv$er-mean.er)/sd.er
+dta_train_p$age_std<-(dta_train_p$age-mean.age)/sd.age
+dta_train_p$nodes_std<-(dta_train_p$nodes-mean.nodes)/sd.nodes
+dta_train_p$pgr_std<-(dta_train_p$pgr-mean.pgr)/sd.pgr
+dta_train_p$er_std<-(dta_train_p$er-mean.er)/sd.er
 
 dta_test$age_std<-(dta_test$age-mean.age)/sd.age
 dta_test$nodes_std<-(dta_test$nodes-mean.nodes)/sd.nodes
 dta_test$pgr_std<-(dta_test$pgr-mean.pgr)/sd.pgr
 dta_test$er_std<-(dta_test$er-mean.er)/sd.er
 
-#add time of interest to the test data
-dta_test$pvtime<-10
-
-#set up learners 
-tune = list(ntrees = c(200),
-            max_depth = 2,
-            shrinkage = c(0.01, 0.1, .2))
-learners = create.Learner("SL.xgboost", tune = tune, detailed_names = T, name_prefix = "xgb")
-
-length(learners$names)
-SL.library <-  c("SL.glm",  "SL.gam",  "SL.ksvm", "SL.ranger",
-                 "SL.rpart", "SL.glmnet","SL.polymars", learners$names)
-
-sl.full.std <- SuperLearner(Y = dta_train_pv$pv, 
-                            X = dta_train_pv[,c("pvtime","year1","year2","age_std","meno","size1","size2","grade","nodes_std","pgr_std",
+set.seed(1)
+sl<- SuperLearner(Y = dta_train_p$pseudo, 
+                            X = dta_train_p[,c("ptime","year1","year2","age_std","meno","size1","size2","grade","nodes_std","pgr_std",
                                                 "er_std","hormon","chemo")],
-                            newX=dta_test[,c("pvtime","year1","year2","age_std","meno","size1","size2","grade","nodes_std","pgr_std",
+                            newX=dta_test[,c("ptime","year1","year2","age_std","meno","size1","size2","grade","nodes_std","pgr_std",
                                              "er_std","hormon","chemo")],
                             SL.library = SL.library, 
-                            id = dta_train_pv$id,
+                            id = dta_train_p$id,
                             verbose = TRUE, 
-                            method = "method.pseudoAUC", control = list(timedex = dta_train_pv$pvtime == 10))
-
-list("SL.mean", "SL.glm", "SL.glmnet", "SL.ranger")
+                            method = "method.pseudoAUC", 
+                            control = list(timedex = dta_train_p$ptime == 10))
 
 
 #---------------------------------
@@ -140,7 +104,7 @@ list("SL.mean", "SL.glm", "SL.glmnet", "SL.ranger")
 #---------------------------------
 #---------------------------------
 
-risk.pred<-sl.full.std$SL.predict
+risk.pred<-sl$SL.predict
 
 #truncate to range 0 to 1
 risk.pred<-ifelse(risk.pred<0,0,risk.pred)
@@ -206,8 +170,8 @@ concordance(Surv(dta_test$time, dta_test$status) ~ risk.pred,
 
 #---
 #C/D AUCt - using our function
-#it is very slightly lower using our function
-wCD_AUCt(time=dta_test$time,status=dta_test$status, risk=risk.pred, seq.time = 10, weightmatrix = wt_matrix_eventsonly)
+max.event.time<-max(dta_test$time[dta_test$status==1])
+wCD_AUCt(time=dta_test$time,status=dta_test$status, risk=risk.pred, seq.time =max.event.time, weightmatrix = wt_matrix_eventsonly)
 
 #---
 #AUC - using timeROC
