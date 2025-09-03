@@ -124,10 +124,6 @@ for(i in 1:n.fold){
     loss.loglik[i,j]<-mean((log(haz.pred[dta_train_split$cv.group==i,j])^cvtest.split$status)*
                         (log(1-haz.pred[dta_train_split$cv.group==i,j])^(1-cvtest.split$status)))
     
-    # #ipcw loss
-    # loss.ipcw[i,j]<-mean(cens.wt[i]*I(cvtest.1row$status==1|(cvtest.1row$status==0 & cvtest.1row$time>10))*
-    #                       (I(cvtest.1row$time>10)-surv.pred[dta_train$cv.group==i,j])^2)
-    
     #ipcw loss
     loss.ipcw[i,j]<-mean(cens.wt[cvtest.rows.1row]*I(cvtest.1row$status==1|(cvtest.1row$status==0 & cvtest.1row$time>10))*
                            (I(cvtest.1row$time>10)-surv.pred[dta_train$cv.group==i,j])^2)
