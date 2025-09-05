@@ -2,7 +2,7 @@
 
 The super learner for time-to-event outcomes: A tutorial.
 
-Ruth Keogh, Karla Diaz-Ordaz, Jon Michael Gran, Kamaryn Tanner, Nan van Geloven
+Ruth Keogh, Karla Diaz-Ordaz, Nan van Geloven, Jon Michael Gran, Kamaryn Tanner.
 
 https://arxiv.org/abs/2509.03315
 
