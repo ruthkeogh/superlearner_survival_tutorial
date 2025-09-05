@@ -4,6 +4,8 @@ The super learner for time-to-event outcomes: A tutorial.
 
 Ruth Keogh, Karla Diaz-Ordaz, Jon Michael Gran, Kamaryn Tanner, Nan van Geloven
 
+https://arxiv.org/abs/2509.03315
+
 Code illustrating the use of the superlearner for time-to-event outcomes. Three methods are used: the discrete-time super learner of Polley and van der Laan (2011), the continuous-time super learner of Westling et al. (2023), and the continuous-time super learner of Munch and Gerds. (2024). The methods are applied to the rotterdam data set available in the 'survival' package in R. Methods are implemented using the packages 'superlearner', 'survSuperLearner' and 'statelearner'. By-hand implementations are also provided to clearly illustrate the steps involved. 
 
 References
