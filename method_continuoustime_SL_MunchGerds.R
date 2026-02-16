@@ -3,7 +3,7 @@
 #Super learner for time-to-event outcomes tutorial
 #
 #Method: continuous-time superLearner
-#Munch and Gerds 2024
+#Munch and Gerds 2024/25
 #################################################################################
 #################################################################################
 
@@ -19,7 +19,7 @@ source("censoring_weights_KM.R")#Kaplan-Meier estimates of censoring weights
 #---------------------------------
 #---------------------------------
 
-#make data into data.table, as required by the statelearner code
+#make data into data.table, as required by the jossl code
 dta_train2<-dta_train
 # dta_train2$status<-dta_train2$status2
 dta_train2<-as.data.table(dta_train2)
@@ -32,10 +32,9 @@ learners <- list(
   rf = list(model = "rfsrc", x_form = ~year1+year2+age+meno+size1+size2+grade+nodes+pgr+er+hormon+chemo,n.time=0)
 )
 
-#apply statelearner
-
+#apply jossl
 set.seed(1)
-sl = statelearner(learners = list(cause1 = learners,
+sl = jossl(learners = list(cause1 = learners,
                                   censor = learners),
                   data = dta_train2,
                   time = 10,
@@ -46,8 +45,9 @@ sl = statelearner(learners = list(cause1 = learners,
                   vars = NULL,
                   collapse = TRUE)
 
-sl$fitted_winners #For cause 1 the best fitting model is rfsrc
+sl$fitted_winners 
 sl$cv_fit
+#For cause 1 the best fitting model is rfsrc
 
 #---------------------------------
 #---------------------------------
@@ -68,21 +68,6 @@ approx.surv <- c(t(sapply(1:nrow(rfsrc.surv), function(i) {
 })))
 
 risk.pred<-1-approx.surv
-
-#---
-#Note that the statelearner code suggests we should be able to use predict to get predictions based on the best fitting model, as shown below.
-#But this gives somewhat different results to just refitting the survival random forest, with poor predictive performance
-#It is possible that this is getting the cumulative incidence for the event being observed in a world in which censoring occurs, i.e. the F function 
-
-# dta_test2<-dta_test
-# dta_test2<-dta_test2[,c("year1","year2","age","meno","size1","size2","grade","nodes","pgr","er","hormon","chemo")]
-# 
-# #this gives risk predictions at 150 times
-# risk.pred.alltimes<-predict(object = sl$fitted_winners$cause1, newdata = dta_test2, 
-#                             onlySL = TRUE)
-# 
-# #predictions at time 10
-# risk.pred2<-risk.pred.alltimes$cif[,150,1]
 
 #---------------------------------
 #---------------------------------
