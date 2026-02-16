@@ -30,8 +30,8 @@ library(SuperLearner)
 library(survSuperLearner)
 
 #---
-#Continuous-time superLearner (statelearner): Munch & Gerds 2024
+#Continuous-time superLearner: Munch & Gerds 2024
 #Need to run the functions in this folder
-#https://github.com/amnudn/joint-survival-super-learner/blob/main/R-code/functions
+#https://github.com/amnudn/joint-survival-super-learner/tree/main/R-code/functions
 
 
