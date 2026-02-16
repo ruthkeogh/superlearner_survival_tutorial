@@ -92,11 +92,11 @@ method_continuoustime_SL_Westling_extralearners.R
 - As in method_continuoustime_SL_Westling.R, but using a larger set of candidate learners.
 
 method_continuoustime_SL_MunchGerds.R
-- Implements the continuous-time discrete SL of Munch & Gerds 2024 using dta_train and evaluates predictive performance in dta_test.
+- Implements the continuous-time discrete SL of Munch & Gerds 2024/25 using dta_train and evaluates predictive performance in dta_test.
 - Uses code from https://github.com/amnudn/joint-survival-super-learner.
 
 method_continuoustime_SL_MunchGerds_byhand.R
-- Implements the continuous-time discrete SL of Munch & Gerds 2024 using dta_train and evaluates predictive performance in dta_test.
+- Implements the continuous-time discrete SL of Munch & Gerds 2024/25 using dta_train and evaluates predictive performance in dta_test.
 - Show how to do this 'by hand' without using the jossl code.
 
 #########################################################
