@@ -45,9 +45,9 @@ plotCalibration(x=xs,models="Cox",method="quantile",q=10,cens.method = "local")
 #calibration plot - using our function
 #This gives same results to those obtained above using riskRegression
 
-cut_points=c(0,quantile(cox.pred,probs=seq(0.1,0.9,0.1)),1)
-risk_group=cut(cox.pred,breaks=cut_points,include.lowest = T,labels = F)
-calib_risk_group<-sapply(FUN=function(x){mean(cox.pred[risk_group==x])},1:10)
+cut_points=c(0,quantile(risk.pred,probs=seq(0.1,0.9,0.1)),1)
+risk_group=cut(risk.pred,breaks=cut_points,include.lowest = T,labels = F)
+calib_risk_group<-sapply(FUN=function(x){mean(risk.pred[risk_group==x])},1:10)
 
 km.grp=survfit(Surv(time,status)~strata(risk_group),data=dta_test)
 
@@ -80,10 +80,10 @@ brier<-Score(list(Cox=cox.mod),Surv(time,status)~1,data=dta_test,
 #Brier score and IPA - using our function
 #gives same results as above
 
-Brier(time=dta_test$time, status=dta_test$status, risk=cox.pred, 
+Brier(time=dta_test$time, status=dta_test$status, risk=risk.pred, 
       seq.time=10, weights=dta_test$cens.wt)
 
-ipa(time=dta_test$time, status=dta_test$status, risk=cox.pred, 
+ipa(time=dta_test$time, status=dta_test$status, risk=risk.pred, 
       seq.time=10, weights=dta_test$cens.wt)
 
 #---------------------------------
@@ -94,10 +94,10 @@ ipa(time=dta_test$time, status=dta_test$status, risk=cox.pred,
 
 #---
 #C-index - using our function
-c_index_ties(time=dta_test$time,status=dta_test$status, risk=cox.pred, tau=10, weightmatrix = wt_matrix_eventsonly)
+c_index_ties(time=dta_test$time,status=dta_test$status, risk=risk.pred, tau=10, weightmatrix = wt_matrix_eventsonly)
 
 #c-index - using concordance
-concordance(Surv(dta_test$time, dta_test$status) ~ cox.pred,
+concordance(Surv(dta_test$time, dta_test$status) ~ risk.pred,
             newdata=dta_test,
             reverse = TRUE,
             timewt = "n/G2")$concordance
@@ -114,7 +114,7 @@ Score(list(Cox=cox.mod),Surv(time,status)~1,data=dta_test,
 
 #---
 #AUC - using timeROC
-timeROC( T = dta_test$time,delta = dta_test$status,marker = cox.pred,
+timeROC( T = dta_test$time,delta = dta_test$status,marker = risk.pred,
          cause = 1,weighting = "marginal",times = 10,iid = FALSE)
 
 
