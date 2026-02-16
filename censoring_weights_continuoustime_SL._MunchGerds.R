@@ -15,12 +15,12 @@
 #---------------------------------
 #---------------------------------
 # time-fixed censoring weights at observed event or censoring times
-# obtained using continuous-time SL, using statelearner
+# obtained using continuous-time SL, using jossl
 # This gives dta_test$cens.wt
 #---------------------------------
 #---------------------------------
 
-#make data into data.table, as required by the statelearner code
+#make data into data.table, as required by the jossl code
 dta_test2<-dta_test
 dta_test2$status<-dta_test2$status2
 dta_test2<-as.data.table(dta_test2)
@@ -33,9 +33,9 @@ learners <- list(
   rf = list(model = "rfsrc", x_form = ~year1+year2+age+meno+size1+size2+grade+nodes+pgr+er+hormon+chemo, ntree = 50)
 )
 
-#apply statelearner
+#apply jossl
 set.seed(1)
-sl = statelearner(learners = list(cause1 = learners,
+sl = jossl(learners = list(cause1 = learners,
                                   censor = learners),
                   data = dta_test2,
                   time = 10,
@@ -60,7 +60,7 @@ dta_test$cens.wt<-1/sapply(1:dim(dta_test)[1],FUN=function(x){cens.prob.sl3$surv
 #---------------------------------
 #---------------------------------
 # time-dependent censoring weights
-# obtained using continuous-time SL, using statelearner
+# obtained using continuous-time SL, using jossl
 # This gives wt_matrix and wt_matrix_eventsonly
 #---------------------------------
 #---------------------------------
