@@ -2,6 +2,8 @@
 #################################################################################
 #Super learner for time-to-event outcomes tutorial
 #Ruth Keogh, July 2025
+#
+#Updated February 2026
 #################################################################################
 #################################################################################
 
@@ -9,9 +11,11 @@
 ##set-up files##
 ################
 
-Run these (packages.R first, rotterdam_setup.R second) before using the other files that run the analyses.
+Run these set-up files before using the other files that run the analyses.
+These files are called at the top of each 'method' file. 
 
 packages.R
+- Run this first
 - Loads packages required across all analyses.
 
 - To install survSuperLearner, use:
@@ -19,9 +23,7 @@ library(devtools)
 devtools::install_github("tedwestling/survSuperLearner")
 More information is available at https://github.com/tedwestling/survSuperLearner
 
-- To install statelearner, download the repository at https://github.com/amnudn/joint-survival-super-learner/tree/main
-and load all functions in the R-code folder
-
+- To install joint survival super learner (jossl), download the repository at https://github.com/amnudn/joint-survival-super-learner and load all functions in the R-code folder
 
 rotterdam_setup.R
 - Sets up the Rotterdam dta (available in the survival package). This includes imposing administrative censoring at 10 years. Training and test data sets are created baed on a 70%/30% split. The training data dta_train is used for model fitting and dta_test is used as a holdout or test data set. 
@@ -30,12 +32,15 @@ functions.R
 - Includes functions used to calculate measures of predictive performance. 
 
 censoring_weights_KM.R
+- Obtain censoring weights in the test data (dta_test), which are required for estimating predictive performance measures using the functions in functions.R, and in some functions used from packages. 
+- censoring_weights_KM.R obtain the weights using Kaplan-Meier, assuming censoring is independent of covariates.
+- The analysis ('method') files use these weights by default.
+
 censoring_weights_discretetime_SL.R
 censoring_weights_continuoustime_SL_Westling.R
 censoring_weights_continuoustime_SL_MunchGerds.R
-- Obtain censoring weights in the test data (dta_test), which are required for estimating predictive performance measures using the functions in functions.R, and in some functions used from packages. 
-- censoring_weights_KM.R obtain the weights using Kaplan-Meier, assuming censoring is independent of covariates.
-- The other three censoring weights files obtain the weights using super learners of different types, allowing censoring to depend on covariates
+- These other three censoring weights files obtain the weights using super learners of different types, allowing censoring to depend on covariates.
+- Only run these if wanted. See the top of each 'method' file where a line can be uncommented to use these files. 
 
 #################################################
 ##files implementing individual models/learners##
@@ -92,7 +97,7 @@ method_continuoustime_SL_MunchGerds.R
 
 method_continuoustime_SL_MunchGerds_byhand.R
 - Implements the continuous-time discrete SL of Munch & Gerds 2024 using dta_train and evaluates predictive performance in dta_test.
-- Show how to do this 'by hand' without using the statelearner code.
+- Show how to do this 'by hand' without using the jossl code.
 
 #########################################################
 ##files implementing pseudo observations super learner##
