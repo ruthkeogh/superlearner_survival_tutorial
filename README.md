@@ -1,4 +1,4 @@
-# superlearner_survival_tutorial
+# The super learner for time-to-event outcomes: A tutorial
 
 The super learner for time-to-event outcomes: A tutorial.
 
